@@ -13,7 +13,9 @@ import Foundation
 /// A marker protocol applied to items which can be put into a property list
 ///
 /// - Attention: Don't make types conform to this! Instead, conform to `PropertyListItemConvertible`
-public protocol PropertyListItem: PropertyListItemConvertible {}
+public protocol PropertyListItem: PropertyListItemConvertible {
+    
+}
 
 
 
@@ -36,10 +38,15 @@ public extension PropertyListItem {
 
 extension NSNumber: PropertyListItem {}
 extension NSString: PropertyListItem {}
+extension NSDate: PropertyListItem {}
+extension NSData: PropertyListItem {}
 extension NSArray: PropertyListItem {}
 extension NSDictionary: RootPropertyListItem {}
 
 extension CFNumber: PropertyListItem {}
+extension CFBoolean: PropertyListItem {}
 extension CFString: PropertyListItem {}
+extension CFDate: PropertyListItem {}
+extension CFData: PropertyListItem {}
 extension CFArray: PropertyListItem {}
 extension CFDictionary: RootPropertyListItem {}

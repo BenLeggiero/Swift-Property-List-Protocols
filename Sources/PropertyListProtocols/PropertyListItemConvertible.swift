@@ -50,6 +50,12 @@ extension Int64: PropertyListItemConvertible {}
 
 
 
+extension Bool: PropertyListItemConvertible {
+    public var propertyListItemValue: PropertyListItem { self as NSNumber }
+}
+
+
+
 public extension BinaryFloatingPoint where Self: PropertyListItemConvertible {
     var propertyListItemValue: PropertyListItem { NSNumber(floatLiteral: .init(self)) }
 }
@@ -64,6 +70,18 @@ public extension StringProtocol where Self: PropertyListItemConvertible {
     var propertyListItemValue: PropertyListItem { self.description as NSString }
 }
 extension String: PropertyListItemConvertible {}
+
+
+
+extension Data: PropertyListItemConvertible {
+    public var propertyListItemValue: PropertyListItem { self as NSData }
+}
+
+
+
+extension Date: PropertyListItemConvertible {
+    public var propertyListItemValue: PropertyListItem { self as NSDate }
+}
 
 
 

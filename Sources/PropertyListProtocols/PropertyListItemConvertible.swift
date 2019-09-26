@@ -10,9 +10,24 @@ import Foundation
 
 
 
-/// A marker protocol applied to items which can be put into a property list
+/// Anything which can be converted into a property list item
 public protocol PropertyListItemConvertible {
     var propertyListItemValue: PropertyListItem { get }
+}
+
+
+
+/// Anything which can be converted into a root property list item
+public protocol RootPropertyListItemConvertible {
+    var rootPropertyListItemValue: RootPropertyListItem { get }
+}
+
+
+
+// MARK: - Synthesis
+
+public extension RootPropertyListItemConvertible {
+    var propertyListItemValue: PropertyListItem { rootPropertyListItemValue }
 }
 
 
@@ -58,8 +73,8 @@ extension Array: PropertyListItemConvertible where Element: PropertyListItemConv
     }
 }
 
-extension Dictionary: PropertyListItemConvertible where Key == String, Value: PropertyListItemConvertible {
-    public var propertyListItemValue: PropertyListItem {
-        return Dictionary<Key, PropertyListItem>(uniqueKeysWithValues: self.map({ key, value in (key, value.propertyListItemValue) })) as NSDictionary
+extension Dictionary: RootPropertyListItemConvertible where Key == String, Value: PropertyListItemConvertible {
+    public var rootPropertyListItemValue: RootPropertyListItem {
+        return Dictionary<Key, PropertyListItem>(uniqueKeysWithValues: map { ($0, $1.propertyListItemValue) } ) as NSDictionary
     }
 }

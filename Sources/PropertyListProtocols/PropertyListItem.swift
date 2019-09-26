@@ -13,7 +13,7 @@ import Foundation
 /// A marker protocol applied to items which can be put into a property list
 ///
 /// - Attention: Don't make types conform to this! Instead, conform to `PropertyListItemConvertible`
-public protocol PropertyListItem: PropertyListItemConvertible {
+public protocol PropertyListItem: class, PropertyListItemConvertible {
     
 }
 

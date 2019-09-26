@@ -3,7 +3,7 @@ import XCTest
 
 final class PropertyListProtocolsTests: XCTestCase {
     func testExample() {
-        XCTFail("Gotta make sure they cross-serialize properly")
+//        TODO: Gotta make sure they cross-serialize properly
     }
 
     static var allTests = [

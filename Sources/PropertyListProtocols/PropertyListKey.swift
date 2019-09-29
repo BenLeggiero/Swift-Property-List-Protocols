@@ -14,6 +14,8 @@ import Foundation
 ///
 /// - Attention: Don't make types conform to this! Instead, conform to `PropertyListKeyConvertible`
 public protocol PropertyListKey: class, PropertyListKeyConvertible {
+    @inlinable
+    var nsStringValue: NSString { get }
 }
 
 
@@ -28,5 +30,14 @@ public extension PropertyListKey {
 
 // MARK: - Autoconformance
 
-extension NSString: PropertyListKey {}
-extension CFString: PropertyListKey {}
+extension NSString: PropertyListKey {
+    @inline(__always)
+    public var nsStringValue: NSString { self }
+}
+
+
+
+extension CFString: PropertyListKey {
+    @inline(__always)
+    public var nsStringValue: NSString { self as NSString }
+}

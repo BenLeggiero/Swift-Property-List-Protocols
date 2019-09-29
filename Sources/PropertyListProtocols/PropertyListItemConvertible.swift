@@ -2,7 +2,7 @@
 //  PropertyListItemConvertible.swift
 //  Property List Protocols
 //
-//  Created by Ben Leggiero on 2019-09-25
+//  Created by Ben Leggiero on 2019-09-25.
 //  Copyright © 2019 Ben Leggiero BH-1-PS
 //
 
@@ -91,8 +91,19 @@ extension Array: PropertyListItemConvertible where Element: PropertyListItemConv
     }
 }
 
-extension Dictionary: RootPropertyListItemConvertible where Key == String, Value: PropertyListItemConvertible {
+
+
+extension Dictionary: RootPropertyListItemConvertible
+where Key: PropertyListKeyConvertible,
+    Value: PropertyListItemConvertible
+{
     public var rootPropertyListItemValue: RootPropertyListItem {
-        return Dictionary<Key, PropertyListItem>(uniqueKeysWithValues: map { ($0, $1.propertyListItemValue) } ) as NSDictionary
+        
+        return [NSString : PropertyListItem](uniqueKeysWithValues:
+            map {
+                ($0.propertyListKeyValue.nsStringValue,
+                 $1.propertyListItemValue)
+            }
+        ) as NSDictionary
     }
 }

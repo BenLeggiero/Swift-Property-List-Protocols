@@ -12,14 +12,41 @@ import Foundation
 
 /// Anything which can be converted into a property list item
 public protocol PropertyListItemConvertible {
-    var propertyListItemValue: PropertyListItem { get }
+    /// Converts this value into a property list item
+    func propertyListItemValue() -> PropertyListItem
 }
 
 
 
 /// Anything which can be converted into a root property list item
 public protocol RootPropertyListItemConvertible {
-    var rootPropertyListItemValue: RootPropertyListItem { get }
+    
+    /// Converts this value into a property list item which can appear at the root of a property list
+    ///
+    /// - Parameter keyFormatter: _optional_ The formatter to use when converting arbitarary keys to property list keys
+    func rootPropertyListItemValue() -> RootPropertyListItem
+    
+    
+    /// Converts this value into a property list item which can appear at the root of a property list
+    ///
+    /// - Parameter keyFormatter: _optional_ The formatter to use when converting arbitarary keys to property list keys
+    func rootPropertyListItemValue(using keyFormatter: PropertyListKeyFormatter) -> RootPropertyListItem
+    
+    
+    
+    /// The kind of function which formats a property list key while a Swift dictionary is being converted into a root
+    /// property list item
+    typealias PropertyListKeyFormatter = (PropertyListKeyConvertible) -> PropertyListKey
+}
+
+
+
+public extension RootPropertyListItemConvertible {
+    func rootPropertyListItemValue() -> RootPropertyListItem {
+        rootPropertyListItemValue { convertible in
+            convertible.propertyListKeyValue().nsStringValue
+        }
+    }
 }
 
 
@@ -27,7 +54,15 @@ public protocol RootPropertyListItemConvertible {
 // MARK: - Synthesis
 
 public extension RootPropertyListItemConvertible {
-    var propertyListItemValue: PropertyListItem { rootPropertyListItemValue }
+    
+    func propertyListItemValue() -> PropertyListItem {
+        rootPropertyListItemValue()
+    }
+    
+    
+    func propertyListItemValue(using keyFormatter: PropertyListKeyFormatter) -> PropertyListItem {
+        rootPropertyListItemValue(using: keyFormatter)
+    }
 }
 
 
@@ -35,7 +70,7 @@ public extension RootPropertyListItemConvertible {
 // MARK: - Autoconformance
 
 public extension BinaryInteger where Self: PropertyListItemConvertible {
-    var propertyListItemValue: PropertyListItem { NSNumber(integerLiteral: .init(self)) }
+    func propertyListItemValue() -> PropertyListItem { NSNumber(integerLiteral: .init(self)) }
 }
 extension UInt: PropertyListItemConvertible {}
 extension UInt8: PropertyListItemConvertible {}
@@ -51,13 +86,13 @@ extension Int64: PropertyListItemConvertible {}
 
 
 extension Bool: PropertyListItemConvertible {
-    public var propertyListItemValue: PropertyListItem { self as NSNumber }
+    public func propertyListItemValue() -> PropertyListItem { self as NSNumber }
 }
 
 
 
 public extension BinaryFloatingPoint where Self: PropertyListItemConvertible {
-    var propertyListItemValue: PropertyListItem { NSNumber(floatLiteral: .init(self)) }
+    func propertyListItemValue() -> PropertyListItem { NSNumber(floatLiteral: .init(self)) }
 }
 extension Float32: PropertyListItemConvertible {}
 extension Float64: PropertyListItemConvertible {}
@@ -67,28 +102,26 @@ extension CGFloat: PropertyListItemConvertible {}
 
 
 public extension StringProtocol where Self: PropertyListItemConvertible {
-    var propertyListItemValue: PropertyListItem { self.description as NSString }
+    func propertyListItemValue() -> PropertyListItem { self.description as NSString }
 }
 extension String: PropertyListItemConvertible {}
 
 
 
 extension Data: PropertyListItemConvertible {
-    public var propertyListItemValue: PropertyListItem { self as NSData }
+    public func propertyListItemValue() -> PropertyListItem { self as NSData }
 }
 
 
 
 extension Date: PropertyListItemConvertible {
-    public var propertyListItemValue: PropertyListItem { self as NSDate }
+    public func propertyListItemValue() -> PropertyListItem { self as NSDate }
 }
 
 
 
 extension Array: PropertyListItemConvertible where Element: PropertyListItemConvertible {
-    public var propertyListItemValue: PropertyListItem {
-        return map { $0.propertyListItemValue } as NSArray
-    }
+    public func propertyListItemValue() -> PropertyListItem { map { $0.propertyListItemValue() } as NSArray }
 }
 
 
@@ -97,13 +130,19 @@ extension Dictionary: RootPropertyListItemConvertible
 where Key: PropertyListKeyConvertible,
     Value: PropertyListItemConvertible
 {
-    public var rootPropertyListItemValue: RootPropertyListItem {
+    /// Converts this Swift dictionary into a root property list item value.
+    ///
+    /// Keys are converted using `propertyListKeyValueFormatter` and values are simply their `.propertyListItemValue`.
+    /// You may change the value of `propertyListKeyValueFormatter` to modify this behavior, but be aware that this is
+    /// a static value, so it's best to change it once at startup and never again.
+    public func rootPropertyListItemValue(using formatter: PropertyListKeyFormatter) -> RootPropertyListItem {
         
-        return [NSString : PropertyListItem](uniqueKeysWithValues:
+        [NSString : PropertyListItem](uniqueKeysWithValues:
             map {
-                ($0.propertyListKeyValue.nsStringValue,
-                 $1.propertyListItemValue)
+                (formatter($0).nsStringValue,
+                 $1.propertyListItemValue())
             }
-        ) as NSDictionary
+        )
+            as NSDictionary
     }
 }

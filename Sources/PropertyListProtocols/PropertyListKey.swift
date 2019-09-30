@@ -23,7 +23,7 @@ public protocol PropertyListKey: class, PropertyListKeyConvertible {
 // MARK: - Synthesis
 
 public extension PropertyListKey {
-    var propertyListKeyValue: PropertyListKey { self }
+    func propertyListKeyValue() -> PropertyListKey { self }
 }
 
 

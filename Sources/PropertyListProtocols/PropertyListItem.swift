@@ -14,7 +14,6 @@ import Foundation
 ///
 /// - Attention: Don't make types conform to this! Instead, conform to `PropertyListItemConvertible`
 public protocol PropertyListItem: class, PropertyListItemConvertible {
-    
 }
 
 
@@ -29,7 +28,7 @@ public protocol RootPropertyListItem: PropertyListItem {}
 // MARK: - Synthesis
 
 public extension PropertyListItem {
-    var propertyListItemValue: PropertyListItem { self }
+    func propertyListItemValue() -> PropertyListItem { self }
 }
 
 

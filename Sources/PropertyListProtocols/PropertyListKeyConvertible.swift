@@ -12,7 +12,9 @@ import Foundation
 
 /// Anything which can be converted into a property list key
 public protocol PropertyListKeyConvertible {
-    var propertyListKeyValue: PropertyListKey { get }
+    
+    /// Converts this value into a property list item
+    func propertyListKeyValue() -> PropertyListKey
 }
 
 
@@ -22,6 +24,6 @@ public protocol PropertyListKeyConvertible {
 
 
 public extension StringProtocol where Self: PropertyListKeyConvertible {
-    var propertyListKeyValue: PropertyListKey { self.description as NSString }
+    func propertyListKeyValue() -> PropertyListKey { self.description as NSString }
 }
 extension String: PropertyListKeyConvertible {}
